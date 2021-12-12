@@ -39,12 +39,12 @@ void ConnectManager::connection_thread()
 	memset(addr_pack, 0, sizeof(addr_pack));
 	while (1)
 	{
-		//static unsigned long g_last_time = GetTickCount();
-		//if (GetTickCount() - g_last_time < 7)
-		//{
-		//	continue;
-		//}
-		//g_last_time = GetTickCount();
+		static unsigned long g_last_time = GetTickCount();
+		if (GetTickCount() - g_last_time < 7)
+		{
+			continue;
+		}
+		g_last_time = GetTickCount();
 
 		Player::GetInstance()->SendPack(PACKET_HEARTBEAT);
 		while (recv(GetSocket(), addr_pack, sizeof(m_packet_out), 0) <= 0);

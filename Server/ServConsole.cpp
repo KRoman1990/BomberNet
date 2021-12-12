@@ -295,7 +295,6 @@ int main()
 			}
 			if (bytes_read != -1 && msg_recv->second != 0 && p_coord != -1)
 			{
-				printf(" %d %d", msg_recv->second, p_coord);
 				if (msg_recv->first == PACKET_BOMB)
 				{
 					if (packet.map[p_coord] == msg_recv->second)
