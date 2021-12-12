@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Client\Bomb.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\Burn.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\ConnectManager.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\Crate.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\game_funcs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\Player.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\ResMng.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\Source.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\Wall.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Client\Bomb.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\Burn.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\config.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\ConnectManager.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\Crate.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\game_functions.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\Player.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\ResMng.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\Wall.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{1baf6c32-03bd-4d27-9d57-b7bddce072e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{ece74ccd-542b-4d93-a471-7ffc18a6dec6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

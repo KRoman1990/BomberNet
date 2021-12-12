@@ -1,0 +1,1 @@
+From HGE/lib/ put dlls to the folder with .exe file

@@ -1,0 +1,56 @@
+#pragma once
+#define LINE_LENGTH 13
+#define COLUMNS 13
+#define MAX_PLAYERS 4
+#define TEX_SIZE 32
+#define PLAYER_CODE 99
+
+enum entities
+{
+	BLOCK_NULL = -1,
+	BLOCK_EMPTY = 0,
+	BLOCK_WALL = 9,
+	BLOCK_CRATE = 5,
+	BLOCK_BOMB = 6,
+	BLOCK_BURNING_1 = 12,
+	BLOCK_BURNING_2 = 13
+};
+
+enum colors
+{
+	GREEN = 0xFF50FF50,
+	BLUE = 0xFF5050FF,
+	YELLOW = 0xFFFFFF50,
+	RED = 0xFFFF5050,
+	WHITE = 0xFFFFFFFF,
+	GREY = 0xA0FFFFFF,
+	DARK_BROWN = 0xA0FFAB00,
+	LIGHT_BROWN = 0xFFFFAB00,
+	BRICK = 0xFFFFA0A0
+};
+
+enum player_code
+{
+	PLAYER_1 = 100,
+	PLAYER_2 = 101,
+	PLAYER_3 = 102,
+	PLAYER_4 = 103
+};
+
+enum directions
+{
+	UP = 0,
+	RIGHT = 1,
+	DOWN = 2,
+	LEFT = 3
+};
+
+enum packets
+{
+	PACKET_UP = 0,
+	PACKET_RIGHT = 1,
+	PACKET_DOWN = 2,
+	PACKET_LEFT = 3,
+	PACKET_BOMB = 4,
+	PACKET_HEARTBEAT = 5
+};
