@@ -8,6 +8,7 @@
 #include "Crate.h"
 #include "Burn.h"
 #include "Bomb.h"
+#include "Enemy.h"
 
 extern std::list<Object*> gObjectList;
 extern CRITICAL_SECTION CriticalSection;
@@ -64,8 +65,48 @@ void ConnectManager::connection_thread()
 			switch (m_packet_out.map[i])
 			{
 			case PLAYER1:
-				Player::GetInstance()->SetCoord(i);
-				gObjectList.push_back(Player::GetInstance());
+				if (Player::GetInstance()->GetId() == PLAYER1)
+				{
+					Player::GetInstance()->SetCoord(i);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER1));
+				}
+				break;
+			case PLAYER2:
+				if (Player::GetInstance()->GetId() == PLAYER2)
+				{
+					Player::GetInstance()->SetCoord(i);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER2));
+				}
+				break;
+			case PLAYER3:
+				if (Player::GetInstance()->GetId() == PLAYER3)
+				{
+					Player::GetInstance()->SetCoord(i);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER3));
+				}
+				break;
+			case PLAYER4:
+				if (Player::GetInstance()->GetId() == PLAYER4)
+				{
+					Player::GetInstance()->SetCoord(i);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER4));
+				}
 				break;
 			case BLOCK_WALL:
 				gObjectList.push_back(new Wall(i));

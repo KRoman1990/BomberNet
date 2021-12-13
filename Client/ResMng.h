@@ -23,6 +23,7 @@ using namespace std;
 #define RES_SPRITE_WALL      110
 #define RES_SPRITE_CRATE     111
 #define RES_SPRITE_BOMB      112
+#define RES_SPRITE_BACK      113
 #define RES_SPRITE_BURN_1    120
 #define RES_SPRITE_BURN_2    121
 
@@ -48,5 +49,8 @@ private:
 	HTEXTURE burn_1;
 	HTEXTURE burn_2;
 	HTEXTURE block;
+	HTEXTURE brick;
+	HTEXTURE bomb;
+	HTEXTURE back;
 	map<string, HTEXTURE> player;
 };

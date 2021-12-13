@@ -24,6 +24,7 @@
     <ClInclude Include="Client\config.h" />
     <ClInclude Include="Client\ConnectManager.h" />
     <ClInclude Include="Client\Crate.h" />
+    <ClInclude Include="Client\Enemy.h" />
     <ClInclude Include="Client\game_functions.h" />
     <ClInclude Include="Client\Player.h" />
     <ClInclude Include="Client\ResMng.h" />
@@ -34,6 +35,7 @@
     <ClCompile Include="Client\Burn.cpp" />
     <ClCompile Include="Client\ConnectManager.cpp" />
     <ClCompile Include="Client\Crate.cpp" />
+    <ClCompile Include="Client\Enemy.cpp" />
     <ClCompile Include="Client\game_funcs.cpp" />
     <ClCompile Include="Client\main.cpp" />
     <ClCompile Include="Client\Player.cpp" />

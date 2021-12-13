@@ -49,13 +49,13 @@ bool render_func() {
 	rmng->GetHge()->Gfx_BeginScene();
 	rmng->GetHge()->Gfx_Clear(0);
 
+	rmng->GetSprite(RES_SPRITE_BACK)->Render(0, 0);
 	EnterCriticalSection(&CriticalSection);
 	for (const auto& o : gObjectList)
 	{
 		o->Draw();
 	}
 	LeaveCriticalSection(&CriticalSection);
-
 	rmng->GetHge()->Gfx_EndScene();
 
 	return false;

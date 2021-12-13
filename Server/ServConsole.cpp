@@ -63,7 +63,7 @@ LPTHREAD_START_ROUTINE bomb_counter()
 		for (int f = 0; f < 20; f++)
 		{
 			bombs[f].countdown--;
-			if (bombs[f].coordinates != -1 && bombs[f].countdown == 0)
+			if ((bombs[f].coordinates != -1 && bombs[f].countdown == 0) || packet.map[bombs[f].coordinates] == BLOCK_BURNING_1)
 			{
 				packet.map[bombs[f].coordinates] = BLOCK_EMPTY;
 				bomb_y_plus = bombs[f].coordinates;
@@ -196,7 +196,7 @@ int main()
 	int player_amt = 1;
 	addrServ.sin_family = AF_INET;
 	addrServ.sin_port = htons(7689);
-	addrServ.sin_addr.s_addr = inet_addr("26.228.53.56");
+	addrServ.sin_addr.s_addr = inet_addr("192.168.1.48");
 	sockServ = socket(AF_INET, SOCK_DGRAM, 0);
 	for (int i = 0; i < 20; i++)
 	{
@@ -291,6 +291,7 @@ int main()
 				if (packet.map[j] == msg_recv->second || packet.map[j] == msg_recv->second + BLOCK_BOMB)
 				{
 					p_coord = j;
+					break;
 				}
 			}
 			if (bytes_read != -1 && msg_recv->second != 0 && p_coord != -1)
