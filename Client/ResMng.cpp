@@ -89,8 +89,11 @@ ResMng::ResMng()
 	hgeInit(&m_hge);
 	block = m_hge->Texture_Load("../pic/block.png");
 	brick = m_hge->Texture_Load("../pic/brick.png");
-	bomb = m_hge->Texture_Load("../pic/bomb.png");
+	bomb_1 = m_hge->Texture_Load("../pic/bomb.png");
+	bomb_2 = m_hge->Texture_Load("../pic/bomb_2.png");
+	bomb_3 = m_hge->Texture_Load("../pic/bomb_3.png");
 	back = m_hge->Texture_Load("../pic/back.png");
+	shield_upg = m_hge->Texture_Load("../pic/shield.png");
 	player["still_forward"] = m_hge->Texture_Load("../pic/player_still_forward.png");
 	player["walk1_forward"] = m_hge->Texture_Load("../pic/player_walk1_forward.png");
 	player["walk1_left"] = m_hge->Texture_Load("../pic/player_walk1_left.png");
@@ -108,9 +111,12 @@ ResMng::ResMng()
 
 
 	SetEnt(block, RES_SPRITE_WALL);
+	SetEnt(shield_upg, RES_SPRITE_SHIELD);
 	SetEnt(back, RES_SPRITE_BACK);
 	SetEnt(brick, RES_SPRITE_CRATE);
-	SetEnt(bomb, RES_SPRITE_BOMB);
+	SetEnt(bomb_1, RES_SPRITE_BOMB_1);
+	SetEnt(bomb_2, RES_SPRITE_BOMB_2);
+	SetEnt(bomb_3, RES_SPRITE_BOMB_3);
 	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_00, RED);
 	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_01, BLUE);
 	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_02, GREEN);

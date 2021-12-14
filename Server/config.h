@@ -5,15 +5,22 @@
 #define TEX_SIZE 32
 #define PLAYER_CODE 99
 
+#define PLAYER1 100
+#define PLAYER2 101
+#define PLAYER3 102
+#define PLAYER4 103
+
 enum entities
 {
 	BLOCK_NULL = -1,
 	BLOCK_EMPTY = 0,
 	BLOCK_WALL = 9,
 	BLOCK_CRATE = 5,
-	BLOCK_BOMB = 6,
+	BLOCK_BOMB_1 = 6,
+	BLOCK_BOMB_2 = 7,
+	BLOCK_BOMB_3 = 8,
 	BLOCK_BURNING_1 = 12,
-	BLOCK_BURNING_2 = 13
+	BLOCK_UPGRADE1 = 13
 };
 
 enum colors

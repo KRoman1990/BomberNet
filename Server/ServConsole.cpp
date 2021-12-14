@@ -63,6 +63,14 @@ LPTHREAD_START_ROUTINE bomb_counter()
 		for (int f = 0; f < 20; f++)
 		{
 			bombs[f].countdown--;
+			if (bombs[f].countdown < 130)
+			{
+				packet.map[bombs[f].coordinates] = BLOCK_BOMB_2;
+			}
+			if (bombs[f].countdown < 60)
+			{
+				packet.map[bombs[f].coordinates] = BLOCK_BOMB_3;
+			}
 			if ((bombs[f].coordinates != -1 && bombs[f].countdown == 0) || packet.map[bombs[f].coordinates] == BLOCK_BURNING_1)
 			{
 				packet.map[bombs[f].coordinates] = BLOCK_EMPTY;
@@ -73,6 +81,8 @@ LPTHREAD_START_ROUTINE bomb_counter()
 				bombs[f].coordinates = BLOCK_NULL;
 				while (1)
 				{
+					std::srand(GetTickCount());
+					int chance;
 					if (bomb_y_plus != BLOCK_NULL)
 					{
 						switch (packet.map[bomb_y_plus])
@@ -81,7 +91,20 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_y_plus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_y_plus] = BLOCK_BURNING_1;
+							packet.map[bomb_y_plus] = BLOCK_EMPTY;
+							std::srand(GetTickCount());
+							chance = std::rand() % 10;
+							if (chance < 5)
+							{
+								packet.map[bomb_y_plus] = BLOCK_UPGRADE1;
+							}
+							bomb_y_plus = BLOCK_NULL;
+							break;
+						case PLAYER1 + BLOCK_UPGRADE1:
+						case PLAYER2 + BLOCK_UPGRADE1:
+						case PLAYER3 + BLOCK_UPGRADE1:
+						case PLAYER4 + BLOCK_UPGRADE1:
+							packet.map[bomb_y_plus] -= BLOCK_UPGRADE1;
 							bomb_y_plus = BLOCK_NULL;
 							break;
 						default:
@@ -98,7 +121,20 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_x_plus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_x_plus] = BLOCK_BURNING_1;
+							packet.map[bomb_x_plus] = BLOCK_EMPTY;
+							std::srand(GetTickCount());
+							chance = std::rand() % 10;
+							if (chance < 5)
+							{
+								packet.map[bomb_x_plus] = BLOCK_UPGRADE1;
+							}
+							bomb_x_plus = BLOCK_NULL;
+							break;
+						case PLAYER1 + BLOCK_UPGRADE1:
+						case PLAYER2 + BLOCK_UPGRADE1:
+						case PLAYER3 + BLOCK_UPGRADE1:
+						case PLAYER4 + BLOCK_UPGRADE1:
+							packet.map[bomb_x_plus] -= BLOCK_UPGRADE1;
 							bomb_x_plus = BLOCK_NULL;
 							break;
 						default:
@@ -115,7 +151,20 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_y_minus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_y_minus] = BLOCK_BURNING_1;
+							packet.map[bomb_y_minus] = BLOCK_EMPTY;
+							std::srand(GetTickCount());
+							chance = std::rand() % 10;
+							if (chance < 5)
+							{
+								packet.map[bomb_y_minus] = BLOCK_UPGRADE1;
+							}
+							bomb_y_minus = BLOCK_NULL;
+							break;
+						case PLAYER1 + BLOCK_UPGRADE1:
+						case PLAYER2 + BLOCK_UPGRADE1:
+						case PLAYER3 + BLOCK_UPGRADE1:
+						case PLAYER4 + BLOCK_UPGRADE1:
+							packet.map[bomb_y_minus] -= BLOCK_UPGRADE1;
 							bomb_y_minus = BLOCK_NULL;
 							break;
 						default:
@@ -132,7 +181,20 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_x_minus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_x_minus] = BLOCK_BURNING_1;
+							packet.map[bomb_x_minus] = BLOCK_EMPTY;
+							std::srand(GetTickCount());
+							chance = std::rand() % 10;
+							if (chance < 5)
+							{
+								packet.map[bomb_x_minus] = BLOCK_UPGRADE1;
+							}
+							bomb_x_minus = BLOCK_NULL;
+							break;
+						case PLAYER1 + BLOCK_UPGRADE1:
+						case PLAYER2 + BLOCK_UPGRADE1:
+						case PLAYER3 + BLOCK_UPGRADE1:
+						case PLAYER4 + BLOCK_UPGRADE1:
+							packet.map[bomb_x_minus] -= BLOCK_UPGRADE1;
 							bomb_x_minus = BLOCK_NULL;
 							break;
 						default:
@@ -151,10 +213,6 @@ LPTHREAD_START_ROUTINE bomb_counter()
 								for (int j = 0; j < COLUMNS; j++)
 								{
 									if (packet.map[j + i * LINE_LENGTH] == BLOCK_BURNING_1)
-									{
-										packet.map[j + i * LINE_LENGTH] = BLOCK_BURNING_2;
-									}
-									else if (packet.map[j + i * LINE_LENGTH] == BLOCK_BURNING_2)
 									{
 										packet.map[j + i * LINE_LENGTH] = BLOCK_EMPTY;
 									}
@@ -288,7 +346,7 @@ int main()
 			message* msg_recv = (message*)bufServ;
 			for (int j = 0; j < LINE_LENGTH * COLUMNS; j++)
 			{
-				if (packet.map[j] == msg_recv->second || packet.map[j] == msg_recv->second + BLOCK_BOMB)
+				if (packet.map[j] == msg_recv->second || packet.map[j] == msg_recv->second + BLOCK_BOMB_1 || packet.map[j] + BLOCK_UPGRADE1 == msg_recv->second)
 				{
 					p_coord = j;
 					break;
@@ -298,7 +356,7 @@ int main()
 			{
 				if (msg_recv->first == PACKET_BOMB)
 				{
-					if (packet.map[p_coord] == msg_recv->second)
+					if (packet.map[p_coord] == msg_recv->second || packet.map[p_coord] + BLOCK_UPGRADE1 == msg_recv->second)
 					{
 						for (int i = 0; i <= 20; i++)
 						{
@@ -310,7 +368,7 @@ int main()
 							{
 								bombs[i].coordinates = p_coord;
 								bombs[i].countdown = 200;
-								packet.map[bombs[i].coordinates] += BLOCK_BOMB;
+								packet.map[bombs[i].coordinates] += BLOCK_BOMB_1;
 								break;
 							}
 						}
@@ -321,32 +379,32 @@ int main()
 					switch (msg_recv->first)
 					{
 					case PACKET_UP:
-						if (packet.map[p_coord - LINE_LENGTH] == BLOCK_EMPTY)
+						if (packet.map[p_coord - LINE_LENGTH] == BLOCK_EMPTY || packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE1)
 						{
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord - LINE_LENGTH] = msg_recv->second;
+							packet.map[p_coord - LINE_LENGTH] += msg_recv->second;
 						}
 						break;
 					case PACKET_DOWN:
-						if (packet.map[p_coord + LINE_LENGTH] == BLOCK_EMPTY)
+						if (packet.map[p_coord + LINE_LENGTH] == BLOCK_EMPTY || packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE1)
 						{
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord + LINE_LENGTH] = msg_recv->second;
+							packet.map[p_coord + LINE_LENGTH] += msg_recv->second;
 						}
 						break;
 					case PACKET_LEFT:
 
-						if (packet.map[p_coord - 1] == BLOCK_EMPTY)
+						if (packet.map[p_coord - 1] == BLOCK_EMPTY || packet.map[p_coord - 1] == BLOCK_UPGRADE1)
 						{
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord - 1] = msg_recv->second;
+							packet.map[p_coord - 1] += msg_recv->second;
 						}
 						break;
 					case PACKET_RIGHT:
-						if (packet.map[p_coord + 1] == BLOCK_EMPTY)
+						if (packet.map[p_coord + 1] == BLOCK_EMPTY || packet.map[p_coord + 1] == BLOCK_UPGRADE1)
 						{
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord + 1] = msg_recv->second;
+							packet.map[p_coord + 1] += msg_recv->second;
 						}
 						break;
 					}

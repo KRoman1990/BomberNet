@@ -28,6 +28,7 @@
     <ClInclude Include="Client\game_functions.h" />
     <ClInclude Include="Client\Player.h" />
     <ClInclude Include="Client\ResMng.h" />
+    <ClInclude Include="Client\Upgrade_Shield.h" />
     <ClInclude Include="Client\Wall.h" />
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +42,7 @@
     <ClCompile Include="Client\Player.cpp" />
     <ClCompile Include="Client\ResMng.cpp" />
     <ClCompile Include="Client\Source.cpp" />
+    <ClCompile Include="Client\Upgrade_Shield.cpp" />
     <ClCompile Include="Client\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>

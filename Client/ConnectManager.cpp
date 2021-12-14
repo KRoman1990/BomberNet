@@ -9,6 +9,7 @@
 #include "Burn.h"
 #include "Bomb.h"
 #include "Enemy.h"
+#include "Upgrade_Shield.h"
 
 extern std::list<Object*> gObjectList;
 extern CRITICAL_SECTION CriticalSection;
@@ -39,13 +40,13 @@ void ConnectManager::connection_thread()
 	memcpy(&m_packet_out, addr_pack, sizeof(m_packet_out));
 	memset(addr_pack, 0, sizeof(addr_pack));
 	while (1)
-	{
+	{/*
 		static unsigned long g_last_time = GetTickCount();
 		if (GetTickCount() - g_last_time < 7)
 		{
 			continue;
 		}
-		g_last_time = GetTickCount();
+		g_last_time = GetTickCount();*/
 
 		Player::GetInstance()->SendPack(PACKET_HEARTBEAT);
 		while (recv(GetSocket(), addr_pack, sizeof(m_packet_out), 0) <= 0);
@@ -68,6 +69,7 @@ void ConnectManager::connection_thread()
 				if (Player::GetInstance()->GetId() == PLAYER1)
 				{
 					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(0);
 					gObjectList.push_back(Player::GetInstance());
 				}
 				else
@@ -79,6 +81,7 @@ void ConnectManager::connection_thread()
 				if (Player::GetInstance()->GetId() == PLAYER2)
 				{
 					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(0);
 					gObjectList.push_back(Player::GetInstance());
 				}
 				else
@@ -90,6 +93,7 @@ void ConnectManager::connection_thread()
 				if (Player::GetInstance()->GetId() == PLAYER3)
 				{
 					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(0);
 					gObjectList.push_back(Player::GetInstance());
 				}
 				else
@@ -101,6 +105,55 @@ void ConnectManager::connection_thread()
 				if (Player::GetInstance()->GetId() == PLAYER4)
 				{
 					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(0);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER4));
+				}
+				break;
+			case PLAYER1 + BLOCK_UPGRADE1:
+				if (Player::GetInstance()->GetId() == PLAYER1)
+				{
+					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(1);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER1));
+				}
+				break;
+			case PLAYER2 + BLOCK_UPGRADE1:
+				if (Player::GetInstance()->GetId() == PLAYER2)
+				{
+					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(1);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER2));
+				}
+				break;
+			case PLAYER3 + BLOCK_UPGRADE1:
+				if (Player::GetInstance()->GetId() == PLAYER3)
+				{
+					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(1);
+					gObjectList.push_back(Player::GetInstance());
+				}
+				else
+				{
+					gObjectList.push_back(new Enemy(i, PLAYER3));
+				}
+				break;
+			case PLAYER4 + BLOCK_UPGRADE1:
+				if (Player::GetInstance()->GetId() == PLAYER4)
+				{
+					Player::GetInstance()->SetCoord(i);
+					Player::GetInstance()->SetUpgrade(1);
 					gObjectList.push_back(Player::GetInstance());
 				}
 				else
@@ -111,11 +164,20 @@ void ConnectManager::connection_thread()
 			case BLOCK_WALL:
 				gObjectList.push_back(new Wall(i));
 				break;
+			case BLOCK_UPGRADE1:
+				gObjectList.push_back(new Shield(i));
+				break;
 			case BLOCK_CRATE:
 				gObjectList.push_back(new Crate(i));
 				break;
-			case BLOCK_BOMB:
-				gObjectList.push_back(new Bomb(i));
+			case BLOCK_BOMB_1:
+				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_1));
+				break;
+			case BLOCK_BOMB_2:
+				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_2));
+				break;
+			case BLOCK_BOMB_3:
+				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_3));
 				break;
 			case BLOCK_BURNING_1:
 				gObjectList.push_back(new Burn(i));

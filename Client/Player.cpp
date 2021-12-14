@@ -45,6 +45,10 @@ void Player::SetCoordPrev(int prev_recv)
 void Player::SendPack(Commands command)
 {
     int packet[2] = { command, GetId() };
+    if (m_upg == 1)
+    {
+        packet[1] += BLOCK_UPGRADE1;
+    }
     auto addr = ConnectManager::GetInstance()->GetAddr();
     sendto(ConnectManager::GetInstance()->GetSocket(), 
         (char*)packet, 
@@ -55,46 +59,24 @@ void Player::SendPack(Commands command)
     );
 }
 
-void Player::SetDirection(int id, int dir, int anim)
+void Player::SetDirection(int dir)
 {
-    int res_id;
-    int color;
-    switch (id)
-    {
-    case 1:
-        color = RED;
-        res_id = RES_SPRITE_PLAYER_00;
-        break;
-    case 2:
-        color = BLUE;
-        res_id = RES_SPRITE_PLAYER_01;
-        break;
-    case 3:
-        color = GREEN;
-        res_id = RES_SPRITE_PLAYER_02;
-        break;
-    case 4:
-        color = YELLOW;
-        res_id = RES_SPRITE_PLAYER_03;
-        break;
-    default:
-        break;
-    }
+    int color = RED;
     switch (dir)
     {
     case UP:
-        switch (anim)
+        switch (animation_state)
         {
         case STILL:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_backward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_backward"), m_id, color);
             SetAnim(WALK1);
             break;
         case WALK1:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_backward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_backward"), m_id, color);
             SetAnim(WALK2);
             break;
         case WALK2:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_backward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_backward"), m_id, color);
             SetAnim(WALK1);
             break;
         default:
@@ -102,18 +84,18 @@ void Player::SetDirection(int id, int dir, int anim)
         }
         break;
     case RIGHT:
-        switch (anim)
+        switch (animation_state)
         {
         case STILL:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_right"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_right"), m_id, color);
             SetAnim(WALK1);
             break;
         case WALK1:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_right"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_right"), m_id, color);
             SetAnim(WALK2);
             break;
         case WALK2:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_right"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_right"), m_id, color);
             SetAnim(WALK1);
             break;
         default:
@@ -121,18 +103,18 @@ void Player::SetDirection(int id, int dir, int anim)
         }
         break;
     case LEFT:
-        switch (anim)
+        switch (animation_state)
         {
         case STILL:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_left"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_left"), m_id, color);
             SetAnim(WALK1);
             break;
         case WALK1:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_left"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_left"), m_id, color);
             SetAnim(WALK2);
             break;
         case WALK2:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_left"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_left"), m_id, color);
             SetAnim(WALK1);
             break;
         default:
@@ -140,18 +122,18 @@ void Player::SetDirection(int id, int dir, int anim)
         }
         break;
     case DOWN:
-        switch (anim)
+        switch (animation_state)
         {
         case STILL:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_forward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("still_forward"), m_id, color);
             SetAnim(WALK1);
             break;
         case WALK1:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_forward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk1_forward"), m_id, color);
             GetInstance()->SetAnim(WALK2);
             break;
         case WALK2:
-            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_forward"), res_id, color);
+            ResMng::GetInstance()->SetEnt(ResMng::GetInstance()->GetPlayerTex("walk2_forward"), m_id, color);
             SetAnim(WALK1);
             break;
         default:
@@ -168,15 +150,19 @@ void Player::KeyProcessing(hgeKeyCode_t key)
 	switch (key)
 	{
 	case HGEK_LEFT:
+        SetDirection(LEFT);
         SendPack(PACKET_LEFT);
 		break;
 	case HGEK_RIGHT:
+        SetDirection(RIGHT);
         SendPack(PACKET_RIGHT);
 		break;
 	case HGEK_UP:
+        SetDirection(UP);
         SendPack(PACKET_UP);
 		break;
 	case HGEK_DOWN:
+        SetDirection(DOWN);
         SendPack(PACKET_DOWN);
 		break;
 	case HGEK_SPACE:
