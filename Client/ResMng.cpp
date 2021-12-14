@@ -79,9 +79,9 @@ hgeSprite* ResMng::CreateSprite(HTEXTURE tex, int color)
 	return sprite;
 }
 
-HTEXTURE ResMng::GetPlayerTex(string key)
+HTEXTURE ResMng::GetPlayerTex(string key, int id)
 {
-	return player[key];
+	return player[id][key];
 }
 
 ResMng::ResMng()
@@ -94,18 +94,54 @@ ResMng::ResMng()
 	bomb_3 = m_hge->Texture_Load("../pic/bomb_3.png");
 	back = m_hge->Texture_Load("../pic/back.png");
 	shield_upg = m_hge->Texture_Load("../pic/shield.png");
-	player["still_forward"] = m_hge->Texture_Load("../pic/player_still_forward.png");
-	player["walk1_forward"] = m_hge->Texture_Load("../pic/player_walk1_forward.png");
-	player["walk1_left"] = m_hge->Texture_Load("../pic/player_walk1_left.png");
-	player["walk1_right"] = m_hge->Texture_Load("../pic/player_walk1_right.png");
-	player["walk1_backward"] = m_hge->Texture_Load("../pic/player_walk1_backward.png");
-	player["walk2_forward"] = m_hge->Texture_Load("../pic/player_walk2_forward.png");
-	player["walk2_backward"] = m_hge->Texture_Load("../pic/player_walk2_backward.png");
-	player["walk2_right"] = m_hge->Texture_Load("../pic/player_walk2_right.png");
-	player["walk2_left"] = m_hge->Texture_Load("../pic/player_walk2_left.png");
-	player["still_left"] = m_hge->Texture_Load("../pic/player_still_left.png");
-	player["still_right"] = m_hge->Texture_Load("../pic/player_still_right.png");
-	player["still_backward"] = m_hge->Texture_Load("../pic/player_still_backward.png");
+	player[PLAYER1]["still_forward"] = m_hge->Texture_Load("../pic/red/player_still_forward.png");
+	player[PLAYER1]["walk1_forward"] = m_hge->Texture_Load("../pic/red/player_walk1_forward.png");
+	player[PLAYER1]["walk1_left"] = m_hge->Texture_Load("../pic/red/player_walk1_left.png");
+	player[PLAYER1]["walk1_right"] = m_hge->Texture_Load("../pic/red/player_walk1_right.png");
+	player[PLAYER1]["walk1_backward"] = m_hge->Texture_Load("../pic/red/player_walk1_backward.png");
+	player[PLAYER1]["walk2_forward"] = m_hge->Texture_Load("../pic/red/player_walk2_forward.png");
+	player[PLAYER1]["walk2_backward"] = m_hge->Texture_Load("../pic/red/player_walk2_backward.png");
+	player[PLAYER1]["walk2_right"] = m_hge->Texture_Load("../pic/red/player_walk2_right.png");
+	player[PLAYER1]["walk2_left"] = m_hge->Texture_Load("../pic/red/player_walk2_left.png");
+	player[PLAYER1]["still_left"] = m_hge->Texture_Load("../pic/red/player_still_left.png");
+	player[PLAYER1]["still_right"] = m_hge->Texture_Load("../pic/red/player_still_right.png");
+	player[PLAYER1]["still_backward"] = m_hge->Texture_Load("../pic/blue/player_still_backward.png");
+	player[PLAYER2]["still_forward"] = m_hge->Texture_Load("../pic/blue/player_still_forward.png");
+	player[PLAYER2]["walk1_forward"] = m_hge->Texture_Load("../pic/blue/player_walk1_forward.png");
+	player[PLAYER2]["walk1_left"] = m_hge->Texture_Load("../pic/blue/player_walk1_left.png");
+	player[PLAYER2]["walk1_right"] = m_hge->Texture_Load("../pic/blue/player_walk1_right.png");
+	player[PLAYER2]["walk1_backward"] = m_hge->Texture_Load("../pic/blue/player_walk1_backward.png");
+	player[PLAYER2]["walk2_forward"] = m_hge->Texture_Load("../pic/blue/player_walk2_forward.png");
+	player[PLAYER2]["walk2_backward"] = m_hge->Texture_Load("../pic/blue/player_walk2_backward.png");
+	player[PLAYER2]["walk2_right"] = m_hge->Texture_Load("../pic/blue/player_walk2_right.png");
+	player[PLAYER2]["walk2_left"] = m_hge->Texture_Load("../pic/blue/player_walk2_left.png");
+	player[PLAYER2]["still_left"] = m_hge->Texture_Load("../pic/blue/player_still_left.png");
+	player[PLAYER2]["still_right"] = m_hge->Texture_Load("../pic/blue/player_still_right.png");
+	player[PLAYER2]["still_backward"] = m_hge->Texture_Load("../pic/blue/player_still_backward.png");
+	player[PLAYER3]["still_forward"] = m_hge->Texture_Load("../pic/green/player_still_forward.png");
+	player[PLAYER3]["walk1_forward"] = m_hge->Texture_Load("../pic/green/player_walk1_forward.png");
+	player[PLAYER3]["walk1_left"] = m_hge->Texture_Load("../pic/green/player_walk1_left.png");
+	player[PLAYER3]["walk1_right"] = m_hge->Texture_Load("../pic/green/player_walk1_right.png");
+	player[PLAYER3]["walk1_backward"] = m_hge->Texture_Load("../pic/green/player_walk1_backward.png");
+	player[PLAYER3]["walk2_forward"] = m_hge->Texture_Load("../pic/green/player_walk2_forward.png");
+	player[PLAYER3]["walk2_backward"] = m_hge->Texture_Load("../pic/green/player_walk2_backward.png");
+	player[PLAYER3]["walk2_right"] = m_hge->Texture_Load("../pic/green/player_walk2_right.png");
+	player[PLAYER3]["walk2_left"] = m_hge->Texture_Load("../pic/green/player_walk2_left.png");
+	player[PLAYER3]["still_left"] = m_hge->Texture_Load("../pic/green/player_still_left.png");
+	player[PLAYER3]["still_right"] = m_hge->Texture_Load("../pic/green/player_still_right.png");
+	player[PLAYER3]["still_backward"] = m_hge->Texture_Load("../pic/green/player_still_backward.png");
+	player[PLAYER4]["still_forward"] = m_hge->Texture_Load("../pic/yellow/player_still_forward.png");
+	player[PLAYER4]["walk1_forward"] = m_hge->Texture_Load("../pic/yellow/player_walk1_forward.png");
+	player[PLAYER4]["walk1_left"] = m_hge->Texture_Load("../pic/yellow/player_walk1_left.png");
+	player[PLAYER4]["walk1_right"] = m_hge->Texture_Load("../pic/yellow/player_walk1_right.png");
+	player[PLAYER4]["walk1_backward"] = m_hge->Texture_Load("../pic/yellow/player_walk1_backward.png");
+	player[PLAYER4]["walk2_forward"] = m_hge->Texture_Load("../pic/yellow/player_walk2_forward.png");
+	player[PLAYER4]["walk2_backward"] = m_hge->Texture_Load("../pic/yellow/player_walk2_backward.png");
+	player[PLAYER4]["walk2_right"] = m_hge->Texture_Load("../pic/yellow/player_walk2_right.png");
+	player[PLAYER4]["walk2_left"] = m_hge->Texture_Load("../pic/yellow/player_walk2_left.png");
+	player[PLAYER4]["still_left"] = m_hge->Texture_Load("../pic/yellow/player_still_left.png");
+	player[PLAYER4]["still_right"] = m_hge->Texture_Load("../pic/yellow/player_still_right.png");
+	player[PLAYER4]["still_backward"] = m_hge->Texture_Load("../pic/yellow/player_still_backward.png");
 	burn_1 = m_hge->Texture_Load("../pic/burn_1.png");
 	burn_2 = m_hge->Texture_Load("../pic/burn_2.png");
 
@@ -117,10 +153,10 @@ ResMng::ResMng()
 	SetEnt(bomb_1, RES_SPRITE_BOMB_1);
 	SetEnt(bomb_2, RES_SPRITE_BOMB_2);
 	SetEnt(bomb_3, RES_SPRITE_BOMB_3);
-	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_00, RED);
-	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_01, BLUE);
-	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_02, GREEN);
-	SetEnt(player["still_forward"], RES_SPRITE_PLAYER_03, YELLOW);
+	SetEnt(player[PLAYER1]["still_forward"], RES_SPRITE_PLAYER_00);
+	SetEnt(player[PLAYER2]["still_forward"], RES_SPRITE_PLAYER_01);
+	SetEnt(player[PLAYER3]["still_forward"], RES_SPRITE_PLAYER_02);
+	SetEnt(player[PLAYER4]["still_forward"], RES_SPRITE_PLAYER_03);
 	SetEnt(burn_1, RES_SPRITE_BURN_1, ORANGE);
 	SetEnt(burn_2, RES_SPRITE_BURN_2, ORANGE);
 }

@@ -41,7 +41,7 @@ public:
 	static ResMng* GetInstance();
 	HGE* GetHge() { return m_hge; }
 	EntDesc SetEnt(HTEXTURE ent_tex, int ent_id, int color = NULL, HEFFECT ent_snd = NULL) { entities[ent_id] = { CreateSprite(ent_tex, color), ent_snd, ent_id }; return entities[ent_id]; }
-	HTEXTURE GetPlayerTex(string key);
+	HTEXTURE GetPlayerTex(string key, int id);
 
 private:
 
@@ -58,5 +58,5 @@ private:
 	HTEXTURE bomb_3;
 	HTEXTURE shield_upg;
 	HTEXTURE back;
-	map<string, HTEXTURE> player;
+	map<int, map<string, HTEXTURE>> player;
 };
