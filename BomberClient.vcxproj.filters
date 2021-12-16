@@ -37,6 +37,9 @@
     <ClCompile Include="Client\Upgrade_Shield.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Client\ManyBombs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client\Bomb.h">
@@ -70,6 +73,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Client\Upgrade_Shield.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\Upgrade_ManyBombs.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

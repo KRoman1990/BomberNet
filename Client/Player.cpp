@@ -166,7 +166,6 @@ void Player::KeyProcessing(hgeKeyCode_t key)
 		break;
 	case HGEK_SPACE:
         SendPack(PACKET_BOMB);
-		Sleep(100);
 		break;
 	default:
 		break;

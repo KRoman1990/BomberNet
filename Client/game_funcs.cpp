@@ -19,7 +19,7 @@ extern CRITICAL_SECTION CriticalSection;
 bool frame_func()
 {
 	static unsigned long g_last_time = GetTickCount();
-	if (GetTickCount() - g_last_time < 100)
+	if (GetTickCount() - g_last_time < 200)
 	{
 		return false;
 	}

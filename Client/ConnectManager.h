@@ -4,7 +4,7 @@
 
 struct PackOut
 {
-	char map[LINE_LENGTH * COLUMNS];
+	int map[LINE_LENGTH * COLUMNS];
 	int id[MAX_PLAYERS];
 };
 

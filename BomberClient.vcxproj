@@ -28,6 +28,7 @@
     <ClInclude Include="Client\game_functions.h" />
     <ClInclude Include="Client\Player.h" />
     <ClInclude Include="Client\ResMng.h" />
+    <ClInclude Include="Client\Upgrade_ManyBombs.h" />
     <ClInclude Include="Client\Upgrade_Shield.h" />
     <ClInclude Include="Client\Wall.h" />
   </ItemGroup>
@@ -39,6 +40,7 @@
     <ClCompile Include="Client\Enemy.cpp" />
     <ClCompile Include="Client\game_funcs.cpp" />
     <ClCompile Include="Client\main.cpp" />
+    <ClCompile Include="Client\ManyBombs.cpp" />
     <ClCompile Include="Client\Player.cpp" />
     <ClCompile Include="Client\ResMng.cpp" />
     <ClCompile Include="Client\Source.cpp" />

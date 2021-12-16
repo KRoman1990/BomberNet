@@ -1,5 +1,8 @@
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
+#include <map>
+#include <string>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,30 +22,29 @@
 #include <netinet/in.h>
 #endif
 
-#define PLAYER_CODE 99
-
-char map_1[] = { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-				 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9,
-				 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9,
-				 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9,
-				 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9,
-				 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9,
-				 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9,
-				 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9,
-				 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9,
-				 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9,
-				 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9,
-				 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9,
-				 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+int map_1[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+				 1, 2048, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2048, 1,
+				 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+				 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+				 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+				 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+				 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+				 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+				 1, 2048, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2048, 1,
+				 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 struct bomb
 {
 	int coordinates;
 	int countdown;
+	int id;
 };
 struct pack
 {
-	char map[LINE_LENGTH * COLUMNS];
+	int map[LINE_LENGTH * COLUMNS];
 	int id[4];
 };
 struct message
@@ -50,6 +52,14 @@ struct message
 	int first;
 	int second;
 };
+struct player
+{
+	int speed;
+	std::map<std::string, bool> upgrades;
+	int bombs = 1;
+	int bombs_max = 1;
+};
+std::map<int, player> players;
 struct bomb bombs[20];
 
 struct pack packet = {};
@@ -91,22 +101,35 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_y_plus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_y_plus] = BLOCK_EMPTY;
+							packet.map[bomb_y_plus] = BLOCK_BURNING_1;
 							std::srand(GetTickCount());
 							chance = std::rand() % 10;
-							if (chance < 5)
+							if (chance < 7)
 							{
 								packet.map[bomb_y_plus] = BLOCK_UPGRADE1;
 							}
+							if (chance < 5)
+							{
+								packet.map[bomb_y_plus] = BLOCK_UPGRADE2;
+							}
 							bomb_y_plus = BLOCK_NULL;
 							break;
-						case PLAYER1 + BLOCK_UPGRADE1:
-						case PLAYER2 + BLOCK_UPGRADE1:
-						case PLAYER3 + BLOCK_UPGRADE1:
-						case PLAYER4 + BLOCK_UPGRADE1:
-							packet.map[bomb_y_plus] -= BLOCK_UPGRADE1;
-							bomb_y_plus = BLOCK_NULL;
-							break;
+						case BLOCK_PLAYER1:
+						case BLOCK_PLAYER2:
+						case BLOCK_PLAYER3:
+						case BLOCK_PLAYER4:
+							if (players[packet.map[bomb_y_plus]].upgrades["shield"])
+							{
+								players[packet.map[bomb_y_plus]].upgrades["shield"] = FALSE;
+								bomb_y_plus = BLOCK_NULL;
+								break;
+							}
+							else
+							{
+								packet.map[bomb_y_plus] = BLOCK_BURNING_1;
+								bomb_y_plus -= LINE_LENGTH;
+								break;
+							}
 						default:
 							packet.map[bomb_y_plus] = BLOCK_BURNING_1;
 							bomb_y_plus -= LINE_LENGTH;
@@ -121,22 +144,35 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_x_plus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_x_plus] = BLOCK_EMPTY;
+							packet.map[bomb_x_plus] = BLOCK_BURNING_1;
 							std::srand(GetTickCount());
 							chance = std::rand() % 10;
-							if (chance < 5)
+							if (chance < 7)
 							{
 								packet.map[bomb_x_plus] = BLOCK_UPGRADE1;
 							}
+							if (chance < 5)
+							{
+								packet.map[bomb_x_plus] = BLOCK_UPGRADE2;
+							}
 							bomb_x_plus = BLOCK_NULL;
 							break;
-						case PLAYER1 + BLOCK_UPGRADE1:
-						case PLAYER2 + BLOCK_UPGRADE1:
-						case PLAYER3 + BLOCK_UPGRADE1:
-						case PLAYER4 + BLOCK_UPGRADE1:
-							packet.map[bomb_x_plus] -= BLOCK_UPGRADE1;
-							bomb_x_plus = BLOCK_NULL;
-							break;
+						case BLOCK_PLAYER1:
+						case BLOCK_PLAYER2:
+						case BLOCK_PLAYER3:
+						case BLOCK_PLAYER4:
+							if (players[packet.map[bomb_x_plus]].upgrades["shield"])
+							{
+								players[packet.map[bomb_x_plus]].upgrades["shield"] = FALSE;
+								bomb_x_plus = BLOCK_NULL;
+								break;
+							}
+							else
+							{
+								packet.map[bomb_x_plus] = BLOCK_BURNING_1;
+								bomb_x_plus += 1;
+								break;
+							}
 						default:
 							packet.map[bomb_x_plus] = BLOCK_BURNING_1;
 							bomb_x_plus++;
@@ -151,22 +187,35 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_y_minus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_y_minus] = BLOCK_EMPTY;
+							packet.map[bomb_y_minus] = BLOCK_BURNING_1;
 							std::srand(GetTickCount());
 							chance = std::rand() % 10;
-							if (chance < 5)
+							if (chance < 7)
 							{
 								packet.map[bomb_y_minus] = BLOCK_UPGRADE1;
 							}
+							if (chance < 5)
+							{
+								packet.map[bomb_y_minus] = BLOCK_UPGRADE2;
+							}
 							bomb_y_minus = BLOCK_NULL;
 							break;
-						case PLAYER1 + BLOCK_UPGRADE1:
-						case PLAYER2 + BLOCK_UPGRADE1:
-						case PLAYER3 + BLOCK_UPGRADE1:
-						case PLAYER4 + BLOCK_UPGRADE1:
-							packet.map[bomb_y_minus] -= BLOCK_UPGRADE1;
-							bomb_y_minus = BLOCK_NULL;
-							break;
+						case BLOCK_PLAYER1:
+						case BLOCK_PLAYER2:
+						case BLOCK_PLAYER3:
+						case BLOCK_PLAYER4:
+							if (players[packet.map[bomb_y_minus]].upgrades["shield"])
+							{
+								players[packet.map[bomb_y_minus]].upgrades["shield"] = FALSE;
+								bomb_y_minus = BLOCK_NULL;
+								break;
+							}
+							else
+							{
+								packet.map[bomb_y_minus] = BLOCK_BURNING_1;
+								bomb_y_minus -= LINE_LENGTH;
+								break;
+							}
 						default:
 							packet.map[bomb_y_minus] = BLOCK_BURNING_1;
 							bomb_y_minus += LINE_LENGTH;
@@ -181,22 +230,35 @@ LPTHREAD_START_ROUTINE bomb_counter()
 							bomb_x_minus = BLOCK_NULL;
 							break;
 						case BLOCK_CRATE:
-							packet.map[bomb_x_minus] = BLOCK_EMPTY;
+							packet.map[bomb_x_minus] = BLOCK_BURNING_1;
 							std::srand(GetTickCount());
 							chance = std::rand() % 10;
-							if (chance < 5)
+							if (chance < 7)
 							{
 								packet.map[bomb_x_minus] = BLOCK_UPGRADE1;
 							}
+							if (chance < 5)
+							{
+								packet.map[bomb_x_minus] = BLOCK_UPGRADE2;
+							}
 							bomb_x_minus = BLOCK_NULL;
 							break;
-						case PLAYER1 + BLOCK_UPGRADE1:
-						case PLAYER2 + BLOCK_UPGRADE1:
-						case PLAYER3 + BLOCK_UPGRADE1:
-						case PLAYER4 + BLOCK_UPGRADE1:
-							packet.map[bomb_x_minus] -= BLOCK_UPGRADE1;
-							bomb_x_minus = BLOCK_NULL;
-							break;
+						case BLOCK_PLAYER1:
+						case BLOCK_PLAYER2:
+						case BLOCK_PLAYER3:
+						case BLOCK_PLAYER4:
+							if (players[packet.map[bomb_x_minus]].upgrades["shield"])
+							{
+								players[packet.map[bomb_x_minus]].upgrades["shield"] = FALSE;
+								bomb_x_minus = BLOCK_NULL;
+								break;
+							}
+							else
+							{
+								packet.map[bomb_x_minus] = BLOCK_BURNING_1;
+								bomb_x_minus -= LINE_LENGTH;
+								break;
+							}
 						default:
 							packet.map[bomb_x_minus] = BLOCK_BURNING_1;
 							bomb_x_minus--;
@@ -205,6 +267,10 @@ LPTHREAD_START_ROUTINE bomb_counter()
 					}
 					if (bomb_y_plus == BLOCK_NULL && bomb_x_plus == BLOCK_NULL && bomb_y_minus == BLOCK_NULL && bomb_x_minus == BLOCK_NULL)
 					{
+						if (players[bombs[f].id].bombs == 0)
+						{
+							players[bombs[f].id].bombs = players[bombs[f].id].bombs_max;
+						}
 						for (int m = 0; m < 2; m++)
 						{
 							Sleep(250);
@@ -278,12 +344,16 @@ int main()
 		int j = 0;
 		for (int k = 0; k < LINE_LENGTH; k++)
 		{
-			if (packet.map[k + i * LINE_LENGTH] == 0 && packet.map[k + i * LINE_LENGTH + 1] != 1 && packet.map[k + i * LINE_LENGTH - 1] != 1 && packet.map[k + i * LINE_LENGTH + LINE_LENGTH] != 1 && packet.map[k + i * LINE_LENGTH - LINE_LENGTH] != 1)
+			if (packet.map[k + i * LINE_LENGTH] == BLOCK_EMPTY && 
+				packet.map[k + i * LINE_LENGTH + 1] != BLOCK_SPAWN &&
+				packet.map[k + i * LINE_LENGTH - 1] != BLOCK_SPAWN &&
+				packet.map[k + i * LINE_LENGTH + LINE_LENGTH] != BLOCK_SPAWN &&
+				packet.map[k + i * LINE_LENGTH - LINE_LENGTH] != BLOCK_SPAWN)
 			{
 				int chance = std::rand() % 100;
 				if (chance < 50)
 				{
-					packet.map[k + i * LINE_LENGTH] = 5;
+					packet.map[k + i * LINE_LENGTH] = BLOCK_CRATE;
 				}
 			}
 		}
@@ -302,7 +372,7 @@ int main()
 			{
 				if (packet.id[n] == -1)
 				{
-					id = n + 100;
+					id = pow(2, (n+1));
 					sendto(sockServ, (char*)&id, sizeof(int), 0, (struct sockaddr*)&addrClient, len);
 					break;
 				}
@@ -316,15 +386,15 @@ int main()
 				int j = 0;
 				for (int k = 0; k < LINE_LENGTH; k++)
 				{
-					if (packet.map[k + i * LINE_LENGTH] == 1)
+					if (packet.map[k + i * 13] == BLOCK_SPAWN)
 					{
 						for (int n = 0; n < MAX_PLAYERS; n++)
 						{
 							if (packet.id[n] == -1)
 							{
-
-								packet.map[k + i * LINE_LENGTH] = n + 100;
-								packet.id[n] = n + 100;
+								packet.map[k + i * 13] = pow(2, (n + 1));
+								packet.id[n] = pow(2, (n + 1));
+								players[id] = { packet.id[n] };
 								break;
 							}
 						}
@@ -346,7 +416,7 @@ int main()
 			message* msg_recv = (message*)bufServ;
 			for (int j = 0; j < LINE_LENGTH * COLUMNS; j++)
 			{
-				if (packet.map[j] == msg_recv->second || packet.map[j] == msg_recv->second + BLOCK_BOMB_1 || packet.map[j] + BLOCK_UPGRADE1 == msg_recv->second)
+				if (packet.map[j] == msg_recv->second || packet.map[j] == msg_recv->second + BLOCK_BOMB_1 || packet.map[j] - BLOCK_UPGRADE1 == msg_recv->second)
 				{
 					p_coord = j;
 					break;
@@ -354,9 +424,9 @@ int main()
 			}
 			if (bytes_read != -1 && msg_recv->second != 0 && p_coord != -1)
 			{
-				if (msg_recv->first == PACKET_BOMB)
+				if (msg_recv->first == PACKET_BOMB && players[msg_recv->second].bombs > 0)
 				{
-					if (packet.map[p_coord] == msg_recv->second || packet.map[p_coord] + BLOCK_UPGRADE1 == msg_recv->second)
+					if (packet.map[p_coord] == msg_recv->second || packet.map[p_coord] - BLOCK_UPGRADE1 == msg_recv->second)
 					{
 						for (int i = 0; i <= 20; i++)
 						{
@@ -366,6 +436,8 @@ int main()
 							}
 							if (bombs[i].coordinates == BLOCK_NULL)
 							{
+								players[msg_recv->second].bombs -= 1;
+								bombs[i].id = msg_recv->second;
 								bombs[i].coordinates = p_coord;
 								bombs[i].countdown = 200;
 								packet.map[bombs[i].coordinates] += BLOCK_BOMB_1;
@@ -379,32 +451,68 @@ int main()
 					switch (msg_recv->first)
 					{
 					case PACKET_UP:
-						if (packet.map[p_coord - LINE_LENGTH] == BLOCK_EMPTY || packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE1)
+						if (packet.map[p_coord - LINE_LENGTH] == BLOCK_EMPTY || (packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE1) || (packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE2))
 						{
+							if (packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE1)
+							{
+								players[msg_recv->second].upgrades["shield"] = TRUE;
+							}
+							if (packet.map[p_coord - LINE_LENGTH] == BLOCK_UPGRADE2)
+							{
+								players[msg_recv->second].bombs++;
+								players[msg_recv->second].bombs_max++;
+							}
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord - LINE_LENGTH] += msg_recv->second;
+							packet.map[p_coord - LINE_LENGTH] = msg_recv->second;
 						}
 						break;
 					case PACKET_DOWN:
-						if (packet.map[p_coord + LINE_LENGTH] == BLOCK_EMPTY || packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE1)
+						if (packet.map[p_coord + LINE_LENGTH] == BLOCK_EMPTY || (packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE1) || (packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE2))
 						{
+							if (packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE1)
+							{
+								players[msg_recv->second].upgrades["shield"] = TRUE;
+							}
+							if (packet.map[p_coord + LINE_LENGTH] == BLOCK_UPGRADE2)
+							{
+								players[msg_recv->second].bombs++;
+								players[msg_recv->second].bombs_max++;
+							}
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord + LINE_LENGTH] += msg_recv->second;
+							packet.map[p_coord + LINE_LENGTH] = msg_recv->second;
 						}
 						break;
 					case PACKET_LEFT:
 
-						if (packet.map[p_coord - 1] == BLOCK_EMPTY || packet.map[p_coord - 1] == BLOCK_UPGRADE1)
+						if (packet.map[p_coord - 1] == BLOCK_EMPTY || (packet.map[p_coord - 1] == BLOCK_UPGRADE1) || (packet.map[p_coord - 1] == BLOCK_UPGRADE2))
 						{
+							if (packet.map[p_coord - 1] == BLOCK_UPGRADE1)
+							{
+								players[msg_recv->second].upgrades["shield"] = TRUE;
+							}
+							if (packet.map[p_coord - 1] == BLOCK_UPGRADE2)
+							{
+								players[msg_recv->second].bombs++;
+								players[msg_recv->second].bombs_max++;
+							}
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord - 1] += msg_recv->second;
+							packet.map[p_coord - 1] = msg_recv->second;
 						}
 						break;
 					case PACKET_RIGHT:
-						if (packet.map[p_coord + 1] == BLOCK_EMPTY || packet.map[p_coord + 1] == BLOCK_UPGRADE1)
+						if (packet.map[p_coord + 1] == BLOCK_EMPTY || (packet.map[p_coord + 1] == BLOCK_UPGRADE1) || (packet.map[p_coord + 1] == BLOCK_UPGRADE2))
 						{
+							if (packet.map[p_coord + 1] == BLOCK_UPGRADE1)
+							{
+								players[msg_recv->second].upgrades["shield"] = TRUE;
+							}
+							if (packet.map[p_coord + 1] == BLOCK_UPGRADE2)
+							{
+								players[msg_recv->second].bombs ++;
+								players[msg_recv->second].bombs_max ++;
+							}
 							packet.map[p_coord] -= msg_recv->second;
-							packet.map[p_coord + 1] += msg_recv->second;
+							packet.map[p_coord + 1] = msg_recv->second;
 						}
 						break;
 					}
