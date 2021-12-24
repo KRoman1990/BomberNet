@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client\Bomb.h" />
+    <ClInclude Include="Client\BombRange.h" />
     <ClInclude Include="Client\Burn.h" />
     <ClInclude Include="Client\config.h" />
     <ClInclude Include="Client\ConnectManager.h" />
     <ClInclude Include="Client\Crate.h" />
     <ClInclude Include="Client\Enemy.h" />
     <ClInclude Include="Client\game_functions.h" />
+    <ClInclude Include="Client\menuitem.h" />
     <ClInclude Include="Client\Player.h" />
     <ClInclude Include="Client\ResMng.h" />
     <ClInclude Include="Client\Upgrade_ManyBombs.h" />
@@ -34,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client\Bomb.cpp" />
+    <ClCompile Include="Client\BombRange.cpp" />
     <ClCompile Include="Client\Burn.cpp" />
     <ClCompile Include="Client\ConnectManager.cpp" />
     <ClCompile Include="Client\Crate.cpp" />
@@ -41,9 +44,9 @@
     <ClCompile Include="Client\game_funcs.cpp" />
     <ClCompile Include="Client\main.cpp" />
     <ClCompile Include="Client\ManyBombs.cpp" />
+    <ClCompile Include="Client\menuitem.cpp" />
     <ClCompile Include="Client\Player.cpp" />
     <ClCompile Include="Client\ResMng.cpp" />
-    <ClCompile Include="Client\Source.cpp" />
     <ClCompile Include="Client\Upgrade_Shield.cpp" />
     <ClCompile Include="Client\Wall.cpp" />
   </ItemGroup>

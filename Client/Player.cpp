@@ -47,7 +47,7 @@ void Player::SendPack(Commands command)
     int packet[2] = { command, GetId() };
     if (m_upg == 1)
     {
-        packet[1] += BLOCK_UPGRADE1;
+        packet[1] += BLOCK_UPGRADE_SHIELD;
     }
     auto addr = ConnectManager::GetInstance()->GetAddr();
     sendto(ConnectManager::GetInstance()->GetSocket(), 

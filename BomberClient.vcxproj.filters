@@ -25,9 +25,6 @@
     <ClCompile Include="Client\ResMng.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Client\Source.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Client\Wall.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -38,6 +35,12 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Client\ManyBombs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\menuitem.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\BombRange.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,6 +79,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Client\Upgrade_ManyBombs.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\menuitem.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\BombRange.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

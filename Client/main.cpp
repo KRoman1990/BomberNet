@@ -23,13 +23,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		exit(-1);
 	}
 
-	int argc = 0;
-	LPWSTR* sz_arglist;
-	sz_arglist = CommandLineToArgvW(GetCommandLineW(), &argc);
-	ConnectManager::GetInstance()->SetSockAddrAndPort(&sz_arglist);
-
-	ConnectManager::GetInstance()->ConnectInit();
-
 	ResMng::GetInstance()->GetHge()->System_Start();
 
 	WSACleanup();

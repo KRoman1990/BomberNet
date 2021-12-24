@@ -1,6 +1,17 @@
 #pragma once
-
-#include"config.h"
+#include <utility>
+#include <winsock.h>
+#include "config.h"
+#include "ResMng.h"
+#include "Player.h"
+#include "Wall.h"
+#include "Crate.h"
+#include "Burn.h"
+#include "Bomb.h"
+#include "Enemy.h"
+#include "Upgrade_Shield.h"
+#include "Upgrade_ManyBombs.h"
+#include "BombRange.h"
 
 struct PackOut
 {
@@ -17,9 +28,10 @@ public:
 	void SetPackIn();
 	PackOut GetPackOut() { return m_packet_out; }
 	void ConnectInit();
+	int ConnectionStatus();
 	int GetSocket() { return m_socket; }
 	struct sockaddr_in GetAddr() { return  m_sock_addr; }
-	void SetSockAddrAndPort(LPWSTR** s);
+	void SetSockAddrAndPort(string s);
 
 private:
 
@@ -37,12 +49,13 @@ private:
 	}
 
 	static DWORD* wrapper_connection_thread() { ConnectManager::GetInstance()->connection_thread(); return nullptr; }
-	void connection_thread();
+	int connection_thread();
 
 	PackOut m_packet_out;
-
+	int connection_delay = 0;
 	sockaddr_in m_sock_addr = {};
 	int m_socket;
+	int connect_stat;
 	HANDLE mut_pack_in;
 	HANDLE mut_pack_out;
 };

@@ -1,17 +1,17 @@
 
 #include <hge.h>
 #include "ResMng.h"
+#include "menuitem.h"
 #include"game_functions.h"
 #include "config.h"
 #include "Player.h"
-
 
 static int hgeInit(HGE** h)
 {
 	(*h) = hgeCreate(HGE_VERSION);
 	(*h)->System_SetState(HGE_LOGFILE, "bomber.log");
-	(*h)->System_SetState(HGE_FRAMEFUNC, frame_func);
-	(*h)->System_SetState(HGE_RENDERFUNC, render_func);
+	(*h)->System_SetState(HGE_FRAMEFUNC, (GameFuncs::GetInstance()->frame_func()));
+	(*h)->System_SetState(HGE_RENDERFUNC, (GameFuncs::GetInstance()->render_func()));
 	(*h)->System_SetState(HGE_TITLE, "Game Demo");
 	(*h)->System_SetState(HGE_FPS, 100);
 	(*h)->System_SetState(HGE_WINDOWED, true);
@@ -89,12 +89,15 @@ ResMng::ResMng()
 	hgeInit(&m_hge);
 	block = m_hge->Texture_Load("../pic/block.png");
 	brick = m_hge->Texture_Load("../pic/brick.png");
+	crs_tex = m_hge->Texture_Load("../pic/cursor.png");
 	bomb_1 = m_hge->Texture_Load("../pic/bomb.png");
 	bomb_2 = m_hge->Texture_Load("../pic/bomb_2.png");
 	bomb_3 = m_hge->Texture_Load("../pic/bomb_3.png");
 	back = m_hge->Texture_Load("../pic/back.png");
 	shield_upg = m_hge->Texture_Load("../pic/shield.png");
+	shield_spr = m_hge->Texture_Load("../pic/shield_on_player.png");
 	bombs_upg = m_hge->Texture_Load("../pic/bombs.png");
+	range_upg = m_hge->Texture_Load("../pic/range.png");
 	player[BLOCK_PLAYER1]["still_forward"] = m_hge->Texture_Load("../pic/red/player_still_forward.png");
 	player[BLOCK_PLAYER1]["walk1_forward"] = m_hge->Texture_Load("../pic/red/player_walk1_forward.png");
 	player[BLOCK_PLAYER1]["walk1_left"] = m_hge->Texture_Load("../pic/red/player_walk1_left.png");
@@ -145,11 +148,16 @@ ResMng::ResMng()
 	player[BLOCK_PLAYER4]["still_backward"] = m_hge->Texture_Load("../pic/yellow/player_still_backward.png");
 	burn_1 = m_hge->Texture_Load("../pic/burn_1.png");
 	burn_2 = m_hge->Texture_Load("../pic/burn_2.png");
+	m_snd_menu = m_hge->Effect_Load("../sounds/menu.wav");
+	m_font = new hgeFont("../pic/font1.fnt");
+	m_font->SetColor(0xFFFFFFFF);
 
 
 	SetEnt(block, RES_SPRITE_WALL);
 	SetEnt(shield_upg, RES_SPRITE_SHIELD);
+	SetEnt(shield_spr, RES_SPRITE_SHIELD_ON_PLAYER);
 	SetEnt(bombs_upg, RES_SPRITE_MANYBOMBS);
+	SetEnt(range_upg, RES_SPRITE_BOMBRANGE);
 	SetEnt(back, RES_SPRITE_BACK);
 	SetEnt(brick, RES_SPRITE_CRATE);
 	SetEnt(bomb_1, RES_SPRITE_BOMB_1);
@@ -160,6 +168,23 @@ ResMng::ResMng()
 	SetEnt(player[BLOCK_PLAYER3]["still_forward"], RES_SPRITE_PLAYER_02);
 	SetEnt(player[BLOCK_PLAYER4]["still_forward"], RES_SPRITE_PLAYER_03);
 	SetEnt(burn_1, RES_SPRITE_BURN_1, ORANGE);
+	SetEnt(crs_tex, RES_SPRITE_CURSOR);
+
+	m_gui = new hgeGUI();
+	m_gui_connect = new hgeGUI();
+
+	m_gui->AddCtrl(new hgeGUIMenuItem(1, m_font, m_snd_menu, SCREENWIDTH / 2, SCREENHEIGHT / 3, 0.0f, "Play"));
+	m_gui->AddCtrl(new hgeGUIMenuItem(2, m_font, m_snd_menu, SCREENWIDTH/2, SCREENHEIGHT/3 + 30, 0.0f, "Connect"));
+	m_gui->AddCtrl(new hgeGUIMenuItem(5, m_font, m_snd_menu, SCREENWIDTH/2, SCREENHEIGHT/3 + 60, 0.4f, "Exit"));
+	auto text = new hgeGUIText(3, SCREENWIDTH / 2 - 80, SCREENHEIGHT / 2 - 30, 0, 0, m_font);
+	text->bVisible = true;
+	text->SetText("Roman chudak");
+	m_gui_connect->AddCtrl(text);
+
+	m_gui->SetNavMode(HGEGUI_UPDOWN | HGEGUI_CYCLED);
+	m_gui->SetCursor(entities[RES_SPRITE_CURSOR].sprite);
+	m_gui->SetFocus(1);
+	m_gui->Enter();
 }
 
 ResMng::~ResMng()
