@@ -87,6 +87,9 @@
     <ClInclude Include="Client\BombRange.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="hge_funcs.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Sources">

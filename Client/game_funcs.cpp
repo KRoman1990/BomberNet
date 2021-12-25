@@ -1,27 +1,37 @@
 
+#include "game_functions.h"
+#include "ConnectManager.h"
 #include <hge.h>
+#include <list>
+#include <string>
+#include "Object.h"
+#include "ResMng.h"
+#include "menuitem.h"
+#include <windows.h>
+#include "config.h"
 #include <hgesprite.h>
 #include <cassert>
 #include <hgefont.h>
 #include <hgegui.h>
-#include <list>
-#include <string>
-#include <windows.h>
-#include "config.h"
-#include "ConnectManager.h"
-#include "game_functions.h"
-#include "Object.h"
 #include "Player.h"
-#include "ResMng.h"
-#include "menuitem.h"
+
+
 
 #define CMNG ConnectManager::GetInstance()
 
 
+std::string menu = "main_menu";
+std::list<Object*> gObjectList = {};
 extern CRITICAL_SECTION CriticalSection;
 
-hgeCallback GameFuncs::frame_func()
+bool frame_func()
 {
+
+	hgeGUI* gui = ResMng::GetInstance()->GetGui();
+	hgeGUI* gui_connect = ResMng::GetInstance()->GetGuiConnect();
+	HGE* hge = ResMng::GetInstance()->GetHge();
+	static int lastid = 0;
+	static int id = -1;
 	if (menu == "main_menu")
 	{
 		const auto dt = hge->Timer_GetDelta();
@@ -37,7 +47,7 @@ hgeCallback GameFuncs::frame_func()
 				menu = "connect";
 				break;
 			case 5:
-				return ;
+				return true;
 			}
 		}
 		else if (id)
@@ -48,6 +58,7 @@ hgeCallback GameFuncs::frame_func()
 	}
 	if (menu == "connect")
 	{
+		static std::string ip = "192.168.1.48";
 		auto& gui_text = *(hgeGUIText*)gui_connect->GetCtrl(3);
 		gui_text.SetText(ip.c_str());
 		switch (hge->Input_GetChar())
@@ -76,6 +87,7 @@ hgeCallback GameFuncs::frame_func()
 			ConnectManager::GetInstance()->SetSockAddrAndPort(ip);
 			ConnectManager::GetInstance()->ConnectInit();
 			menu = "game";
+			return false;
 		}
 		if (hge->Input_GetKey() == HGEK_ESCAPE)
 		{
@@ -87,22 +99,63 @@ hgeCallback GameFuncs::frame_func()
 	}
 	if (menu == "game")
 	{
-		Game();
+		if (ConnectManager::GetInstance()->ConnectionStatus() == DISCONNECTED)
+		{
+			menu = "disconnected";
+		}
+		static unsigned long g_last_time = GetTickCount();
+		if (GetTickCount() - g_last_time < 200)
+		{
+			return false;
+		}
+		g_last_time = GetTickCount();
+
+		if (hge->Input_GetKeyState(HGEK_ESCAPE))
+		{
+			lastid = 0;
+			gui->SetFocus(1);
+			gui->Enter();
+			menu = "main_menu";
+		}
+
+		const vector<hgeKeyCode_t> keys = { HGEK_LEFT, HGEK_RIGHT, HGEK_UP, HGEK_DOWN, HGEK_SPACE };
+		for (const auto& k : keys)
+		{
+			if (hge->Input_GetKeyState(k))
+			{
+				Player::GetInstance()->KeyProcessing(k);
+				break;
+			}
+		}
 		return false;
 	}
 	if (menu == "disconnected")
 	{
-		Disconnect();
+		static int delay = GetTickCount();
+		static string message = "You were disconnected";
+		auto& gui_text = *(hgeGUIText*)gui_connect->GetCtrl(3);
+		gui_text.SetText(message.c_str());
+		if (GetTickCount() - delay > 1000)
+		{
+			lastid = 0;
+			id = -1;
+			gui->SetFocus(1);
+			gui->Enter();
+			menu = "main_menu";
+		}
 		return false;
 	}
 }
 
 
-hgeCallback GameFuncs::render_func()
+bool render_func()
 {
 	ResMng* rmng = ResMng::GetInstance();
 	rmng->GetHge()->Gfx_BeginScene();
 	rmng->GetHge()->Gfx_Clear(0);
+
+	hgeGUI* gui = ResMng::GetInstance()->GetGui();
+	hgeGUI* gui_connect = ResMng::GetInstance()->GetGuiConnect();
 	if (menu == "main_menu")
 	{
 		gui->Render();
@@ -123,62 +176,4 @@ hgeCallback GameFuncs::render_func()
 	}
 	rmng->GetHge()->Gfx_EndScene();
 	return false;
-}
-
-void GameFuncs::Disconnect()
-{
-	static int delay = GetTickCount();
-	static string message = "You were disconnected";
-	auto& gui_text = *(hgeGUIText*)gui_connect->GetCtrl(3);
-	gui_text.SetText(message.c_str());
-	if (GetTickCount() - delay > 1000)
-	{
-		lastid = 0;
-		id = -1;
-		gui->SetFocus(1);
-		gui->Enter();
-		menu = "main_menu";
-	}
-}
-
-void GameFuncs::Game()
-{
-	if (ConnectManager::GetInstance()->ConnectionStatus() == DISCONNECTED)
-	{
-		menu = "disconnected";
-	}
-	static unsigned long g_last_time = GetTickCount();
-	if (GetTickCount() - g_last_time < 200)
-	{
-		return;
-	}
-	g_last_time = GetTickCount();
-
-	if (hge->Input_GetKeyState(HGEK_ESCAPE))
-	{
-		lastid = 0;
-		gui->SetFocus(1);
-		gui->Enter();
-		menu = "main_menu";
-	}
-
-	const vector<hgeKeyCode_t> keys = { HGEK_LEFT, HGEK_RIGHT, HGEK_UP, HGEK_DOWN, HGEK_SPACE };
-	for (const auto& k : keys)
-	{
-		if (hge->Input_GetKeyState(k))
-		{
-			Player::GetInstance()->KeyProcessing(k);
-			break;
-		}
-	}
-}
-
-GameFuncs* GameFuncs::GetInstance()
-{
-	static GameFuncs* instance;
-	if (!instance)
-	{
-		instance = new GameFuncs();
-	}
-	return instance;
 }

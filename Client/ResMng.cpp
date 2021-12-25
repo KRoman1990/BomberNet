@@ -10,8 +10,8 @@ static int hgeInit(HGE** h)
 {
 	(*h) = hgeCreate(HGE_VERSION);
 	(*h)->System_SetState(HGE_LOGFILE, "bomber.log");
-	(*h)->System_SetState(HGE_FRAMEFUNC, (GameFuncs::GetInstance()->frame_func()));
-	(*h)->System_SetState(HGE_RENDERFUNC, (GameFuncs::GetInstance()->render_func()));
+	(*h)->System_SetState(HGE_FRAMEFUNC, frame_func);
+	(*h)->System_SetState(HGE_RENDERFUNC, render_func);
 	(*h)->System_SetState(HGE_TITLE, "Game Demo");
 	(*h)->System_SetState(HGE_FPS, 100);
 	(*h)->System_SetState(HGE_WINDOWED, true);
