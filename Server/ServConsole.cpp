@@ -72,7 +72,7 @@ struct pack packet = {};
 LPTHREAD_START_ROUTINE bomb_counter()
 {
 	static int count = GetTickCount();
-	int bomb_y_plus, bomb_x_plus, bomb_y_minus, bomb_x_minus, player_hit;
+	int bomb_y_plus, bomb_x_plus, bomb_y_minus, bomb_x_minus;
 	while (1)
 	{
 		for (int f = 0; f < 20; f++)

@@ -13,7 +13,7 @@
     <ClCompile Include="Client\Crate.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Client\game_funcs.cpp">
+    <ClCompile Include="Client\GameFuncs.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Client\main.cpp">
@@ -60,7 +60,7 @@
     <ClInclude Include="Client\Crate.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Client\game_functions.h">
+    <ClInclude Include="Client\GameFuncs.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Client\Player.h">
@@ -87,7 +87,7 @@
     <ClInclude Include="Client\BombRange.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hge_funcs.h">
+    <ClInclude Include="Client\Resources.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

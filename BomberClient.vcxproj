@@ -26,14 +26,14 @@
     <ClInclude Include="Client\ConnectManager.h" />
     <ClInclude Include="Client\Crate.h" />
     <ClInclude Include="Client\Enemy.h" />
-    <ClInclude Include="Client\game_functions.h" />
+    <ClInclude Include="Client\GameFuncs.h" />
     <ClInclude Include="Client\menuitem.h" />
     <ClInclude Include="Client\Player.h" />
     <ClInclude Include="Client\ResMng.h" />
+    <ClInclude Include="Client\Resources.h" />
     <ClInclude Include="Client\Upgrade_ManyBombs.h" />
     <ClInclude Include="Client\Upgrade_Shield.h" />
     <ClInclude Include="Client\Wall.h" />
-    <ClInclude Include="hge_funcs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client\Bomb.cpp" />
@@ -42,7 +42,7 @@
     <ClCompile Include="Client\ConnectManager.cpp" />
     <ClCompile Include="Client\Crate.cpp" />
     <ClCompile Include="Client\Enemy.cpp" />
-    <ClCompile Include="Client\game_funcs.cpp" />
+    <ClCompile Include="Client\GameFuncs.cpp" />
     <ClCompile Include="Client\main.cpp" />
     <ClCompile Include="Client\ManyBombs.cpp" />
     <ClCompile Include="Client\menuitem.cpp" />

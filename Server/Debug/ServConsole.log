@@ -1,1 +1,6 @@
-﻿  ServConsole.vcxproj -> D:\Projects\BomberNet\Debug\ServConsole.exe
+﻿  ServConsole.cpp
+D:\Projects\BomberNet\Server\ServConsole.cpp(377,15): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\Projects\BomberNet\Server\ServConsole.cpp(406,14): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\Projects\BomberNet\Server\ServConsole.cpp(426,37): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\Projects\BomberNet\Server\ServConsole.cpp(427,27): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  ServConsole.vcxproj -> D:\Projects\BomberNet\Debug\ServConsole.exe

@@ -8,6 +8,8 @@
 #define SCREENWIDTH 624
 #define SCREENHEIGHT 624
 #define SCREEN_MERGE 24
+#define MAGIC_CONNECT_KEY 123
+#define CONNECT_PORT 7689
 
 enum entities
 {

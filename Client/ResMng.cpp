@@ -2,7 +2,7 @@
 #include <hge.h>
 #include "ResMng.h"
 #include "menuitem.h"
-#include"game_functions.h"
+#include "GameFuncs.h"
 #include "config.h"
 #include "Player.h"
 
@@ -23,8 +23,6 @@ static int hgeInit(HGE** h)
 }
 
 //static
-
-
 ResMng* ResMng::GetInstance()
 {
 	static ResMng* instance;
@@ -44,6 +42,7 @@ hgeSprite* ResMng::GetSprite(int ent_id)
 			return e.second.sprite;
 		}
 	}
+	assert(0);
 }
 
 HEFFECT ResMng::GetSound(int ent_id)
@@ -55,6 +54,7 @@ HEFFECT ResMng::GetSound(int ent_id)
 			return e.second.sound;
 		}
 	}
+	assert(0);
 }
 
 hgeSprite* ResMng::CreateSprite(HTEXTURE tex, int color)
@@ -151,7 +151,6 @@ ResMng::ResMng()
 	m_snd_menu = m_hge->Effect_Load("../sounds/menu.wav");
 	m_font = new hgeFont("../pic/font1.fnt");
 	m_font->SetColor(0xFFFFFFFF);
-
 
 	SetEnt(block, RES_SPRITE_WALL);
 	SetEnt(shield_upg, RES_SPRITE_SHIELD);

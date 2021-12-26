@@ -1,13 +1,15 @@
-#include <cassert>
 #include "ConnectManager.h"
+#include <cassert>
 
-extern std::list<Object*> gObjectList;
-extern CRITICAL_SECTION CriticalSection;
+#include "GameFuncs.h"
+#include "ResMng.h"
+#include "Resources.h"
+
 
 //static
 ConnectManager* ConnectManager::GetInstance()
 {
-	static ConnectManager* instance;
+	static ConnectManager* instance = nullptr;
 	if (!instance)
 	{
 		instance = new ConnectManager();
@@ -17,175 +19,151 @@ ConnectManager* ConnectManager::GetInstance()
 
 int ConnectManager::ConnectionStatus()
 {
-	return connect_stat;
+	return m_connect_stat;
 }
-
 
 int ConnectManager::connection_thread()
 {
-	connect_stat = DISCONNECTED;
-	int key = 123;
-	char addr_pack[1024] = {};
+	int key = MAGIC_CONNECT_KEY;
 	int id;
 	auto addr = GetAddr();
-	connect(GetSocket(), (sockaddr*)&addr, sizeof(GetAddr()));
-	send(GetSocket(), (char*)&key, sizeof(int), 0);
-	while (recv(GetSocket(), (char*)&id, sizeof(int), 0) <= 0);
-	connect_stat = CONNECTED;
-	connection_delay = 0;
+
+	connect(m_socket, (sockaddr*)&addr, sizeof(GetAddr()));
+	send(m_socket, (char*)&key, sizeof(int), 0);
+	while (recv(m_socket, (char*)&id, sizeof(int), 0) <= 0);
+
+	m_connect_stat = CONNECTED;
+	m_connection_delay = 0;
 	auto pg = Player::GetInstance();
 	pg->SetId(id);
-	while (recv(GetSocket(), addr_pack, sizeof(m_packet_out), 0) <= 0);
-	connection_delay = 0;
-	memcpy(&m_packet_out, addr_pack, sizeof(m_packet_out));
-	memset(addr_pack, 0, sizeof(addr_pack));
+
 	while (1)
 	{
-		/*static unsigned long g_last_time = GetTickCount();
-		if (GetTickCount() - g_last_time < 250)
+		char buffer[1024] = {};
+		while (recv(m_socket, buffer, sizeof(PackOut), 0) <= 0 && m_connection_delay <= 10000)
 		{
-			continue;
-		}
-		g_last_time = GetTickCount();*/
-
-		pg->SendPack(PACKET_HEARTBEAT);
-		while (recv(GetSocket(), addr_pack, sizeof(m_packet_out), 0) <= 0 && connection_delay <= 10000)
-		{
-			connection_delay++;
-			if (connection_delay > 10000)
+			m_connection_delay++;
+			if (m_connection_delay > 10000)
 			{
-				connect_stat = DISCONNECTED;
+				m_connect_stat = DISCONNECTED;
 			}
 		}
-		connection_delay = 0;
-		memcpy(&m_packet_out, addr_pack, sizeof(m_packet_out));
+		m_connection_delay = 0;
+		PackOut &packet_out = *(PackOut *)buffer;
 
-		EnterCriticalSection(&CriticalSection);
-		for (auto& o : gObjectList)
-		{
-			if (o != Player::GetInstance())
-			{
-				delete(o);
-			}
-		}
-		gObjectList.clear();
+		EnterCriticalSection(GameFuncs::GetInstance()->GetCriticalSection());
+		GameFuncs::GetInstance()->ReleaseObjectList();
 		for (int i = 0; i < LINE_LENGTH * COLUMNS; i++)
 		{
-			int point = m_packet_out.map[i];
-			if (m_packet_out.map[i] & BLOCK_WALL)
+			int player_point = packet_out.map[i];
+			if (player_point & BLOCK_WALL)
 			{
-				gObjectList.push_back(new Wall(i));
+				GameFuncs::GetInstance()->AddObjectList(new Wall(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_UPGRADE_SHIELD && !((
-				m_packet_out.map[i] & BLOCK_PLAYER1 ||
-				m_packet_out.map[i] & BLOCK_PLAYER2 ||
-				m_packet_out.map[i] & BLOCK_PLAYER3 ||
-				m_packet_out.map[i] & BLOCK_PLAYER4)))
+			if (player_point & BLOCK_UPGRADE_SHIELD && !((
+				player_point & BLOCK_PLAYER1 ||
+				player_point & BLOCK_PLAYER2 ||
+				player_point & BLOCK_PLAYER3 ||
+				player_point & BLOCK_PLAYER4)))
 			{
-				gObjectList.push_back(new Shield(i));
+				GameFuncs::GetInstance()->AddObjectList(new Shield(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_UPGRADE_MANYBOMBS && !((
-				m_packet_out.map[i] & BLOCK_PLAYER1 ||
-				m_packet_out.map[i] & BLOCK_PLAYER2 ||
-				m_packet_out.map[i] & BLOCK_PLAYER3 ||
-				m_packet_out.map[i] & BLOCK_PLAYER4)))
+			if (player_point & BLOCK_UPGRADE_MANYBOMBS && !((
+				player_point & BLOCK_PLAYER1 ||
+				player_point & BLOCK_PLAYER2 ||
+				player_point & BLOCK_PLAYER3 ||
+				player_point & BLOCK_PLAYER4)))
 			{
-				gObjectList.push_back(new ManyBombs(i));
+				GameFuncs::GetInstance()->AddObjectList(new ManyBombs(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_UPGRADE_BOMBRANGE && !((
-				m_packet_out.map[i] & BLOCK_PLAYER1 ||
-				m_packet_out.map[i] & BLOCK_PLAYER2 ||
-				m_packet_out.map[i] & BLOCK_PLAYER3 ||
-				m_packet_out.map[i] & BLOCK_PLAYER4)))
+			if (player_point & BLOCK_UPGRADE_BOMBRANGE && !((
+				player_point & BLOCK_PLAYER1 ||
+				player_point & BLOCK_PLAYER2 ||
+				player_point & BLOCK_PLAYER3 ||
+				player_point & BLOCK_PLAYER4)))
 			{
-				gObjectList.push_back(new BombRange(i));
+				GameFuncs::GetInstance()->AddObjectList(new BombRange(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_CRATE)
+			if (player_point & BLOCK_CRATE)
 			{
-				gObjectList.push_back(new Crate(i));
+				GameFuncs::GetInstance()->AddObjectList(new Crate(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_BOMB_1)
+			if (player_point & BLOCK_BOMB_1)
 			{
-				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_1));
+				GameFuncs::GetInstance()->AddObjectList(new Bomb(i, RES_SPRITE_BOMB_1));
 			}
-			if (m_packet_out.map[i] & BLOCK_BOMB_2)
+			if (player_point & BLOCK_BOMB_2)
 			{
-				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_2));
+				GameFuncs::GetInstance()->AddObjectList(new Bomb(i, RES_SPRITE_BOMB_2));
 			}
-			if (m_packet_out.map[i] & BLOCK_BOMB_3)
+			if (player_point & BLOCK_BOMB_3)
 			{
-				gObjectList.push_back(new Bomb(i, RES_SPRITE_BOMB_3));
+				GameFuncs::GetInstance()->AddObjectList(new Bomb(i, RES_SPRITE_BOMB_3));
 			}
-			if (m_packet_out.map[i] & BLOCK_BURNING_1)
+			if (player_point & BLOCK_BURNING_1)
 			{
-				gObjectList.push_back(new Burn(i));
+				GameFuncs::GetInstance()->AddObjectList(new Burn(i));
 			}
-			if (m_packet_out.map[i] & BLOCK_PLAYER1 ||
-				m_packet_out.map[i] & BLOCK_PLAYER2 ||
-				m_packet_out.map[i] & BLOCK_PLAYER3 ||
-				m_packet_out.map[i] & BLOCK_PLAYER4)
+			if (player_point & BLOCK_PLAYER1 ||
+				player_point & BLOCK_PLAYER2 ||
+				player_point & BLOCK_PLAYER3 ||
+				player_point & BLOCK_PLAYER4)
 			{
 
-				if (m_packet_out.map[i] & BLOCK_BOMB_1)
+				if (player_point & BLOCK_BOMB_1)
 				{
-					point -= BLOCK_BOMB_1;
+					player_point -= BLOCK_BOMB_1;
 				}
-				if (m_packet_out.map[i] & BLOCK_BOMB_2)
+				if (player_point & BLOCK_BOMB_2)
 				{
-					point -= BLOCK_BOMB_2;
+					player_point -= BLOCK_BOMB_2;
 				}
-				if (m_packet_out.map[i] & BLOCK_BOMB_3)
+				if (player_point & BLOCK_BOMB_3)
 				{
-					point -= BLOCK_BOMB_3;
+					player_point -= BLOCK_BOMB_3;
 				}
-				if (m_packet_out.map[i] & BLOCK_UPGRADE_SHIELD)
+				if (player_point & BLOCK_UPGRADE_SHIELD)
 				{
-					point -= BLOCK_UPGRADE_SHIELD;
+					player_point -= BLOCK_UPGRADE_SHIELD;
 				}
-				if (pg->GetId() == point)
+				if (pg->GetId() == player_point)
 				{
 					pg->SetCoord(i);
-					gObjectList.push_back(Player::GetInstance());
+					GameFuncs::GetInstance()->AddObjectList(Player::GetInstance());
 				}
 				else
 				{
-					gObjectList.push_back(new Enemy(i, (point)));
+					GameFuncs::GetInstance()->AddObjectList(new Enemy(i, (player_point)));
 				}
-				if (m_packet_out.map[i] & BLOCK_UPGRADE_SHIELD && (
-					m_packet_out.map[i] & BLOCK_PLAYER1 ||
-					m_packet_out.map[i] & BLOCK_PLAYER2 ||
-					m_packet_out.map[i] & BLOCK_PLAYER3 ||
-					m_packet_out.map[i] & BLOCK_PLAYER4))
+				if (player_point & BLOCK_UPGRADE_SHIELD && (
+					player_point & BLOCK_PLAYER1 ||
+					player_point & BLOCK_PLAYER2 ||
+					player_point & BLOCK_PLAYER3 ||
+					player_point & BLOCK_PLAYER4))
 				{
-					gObjectList.push_back(new ShieldOnPlayer(i));
+					GameFuncs::GetInstance()->AddObjectList(new ShieldOnPlayer(i));
 				}
 			}
 		}
-		LeaveCriticalSection(&CriticalSection);
+		LeaveCriticalSection(GameFuncs::GetInstance()->GetCriticalSection());
+
+		pg->SendPack(PACKET_HEARTBEAT);
 	}
 }
 
-void ConnectManager::ConnectInit()
+void ConnectManager::ConnectThread()
 {
 	unsigned long threadId;
 	void* thread;
 	thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)wrapper_connection_thread, NULL, 0, &threadId);
 }
 
-void ConnectManager::SetSockAddrAndPort(string s)
+void ConnectManager::SetSockAddrAndPort(std::string s)
 {
-	int switch_ = 0;
-	string s_ip;
-	for (auto a : s)
-	{
-		s_ip.push_back(a);
-	}
-	const char* argv = s_ip.c_str();
-
 	// addr parsing
 	m_sock_addr.sin_family = AF_INET;
-	m_sock_addr.sin_addr.s_addr = inet_addr(argv);
+	m_sock_addr.sin_addr.s_addr = inet_addr(s.c_str());
 
 	// port parsing
-	m_sock_addr.sin_port = htons(7689);
+	m_sock_addr.sin_port = htons(CONNECT_PORT);
 }
